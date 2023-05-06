@@ -1,18 +1,14 @@
 import pygame
 import random
-import tetrominos as tt
+from tetrominos import *
 from camera import *
 
-
-
-# creating the data structure for pieces
-# setting up global vars
-# functions
-# - create_grid
-# - draw_grid
-# - draw_window
-# - rotating shape in main
-# - setting up the main
+# TODO:
+# Comentarios en Ingles - Luis
+# Snake Case - Luis 
+# 80 Caracteres horizontal - David
+# Separar en scripts - David
+# Espaciado entre operadores y valores - David
 
 """
 10 x 20 square grid
@@ -22,7 +18,7 @@ represented in order by 0 - 6
 
 pygame.font.init()
 
-# Variables Globales
+# Global Variables
 s_width = 1600
 s_height = 900
 playWidth = 300  # meaning 300 // 10 = 30 width per block
@@ -33,10 +29,10 @@ topLeftX = (s_width - playWidth) // 2
 topLeftY = s_height - playHeight
 
 
-# SHAPE FORMATS
-shapes = [tt.S, tt.Z, tt.I, tt.O, tt.J, tt.L, tt.T]
+# Shape formats, positions and colors
+shapes = [S, Z, I, O, J, L, T]
+shape_valid_positions = [pos_S, pos_Z, pos_I, pos_O, pos_J, pos_L, pos_T]
 shape_colors = [(0, 255, 0), (255, 0, 0), (0, 255, 255), (255, 255, 0), (255, 165, 0), (0, 0, 255), (128, 0, 128)]
-# index 0 - 6 represent shape
 
 class Piece(object):
     def __init__(self, column, row, shape):
@@ -204,9 +200,13 @@ def main(win):
     window_width = camera_captured.get(3)
 
     while run:
-        hand_position = hand_controller(camera_captured, window_width, hands, hands_detector, hands_drawing, currentPiece.x)
-        if hand_position >=9:
-            hand_position = 9
+        current_piece_position_array = shape_valid_positions[shapes.index(currentPiece.shape)]
+        position_values = current_piece_position_array[currentPiece.rotation % len(current_piece_position_array)]
+        max_position_value = max(current_piece_position_array[currentPiece.rotation % len(current_piece_position_array)])
+        hand_position = hand_controller(camera_captured, window_width, hands, hands_detector, hands_drawing, currentPiece.x, position_values)
+
+        if hand_position >= max_position_value+1:
+            hand_position = max_position_value
 
         grid = create_grid(lockedPositions)
         fallTime += clock.get_rawtime()

@@ -12,7 +12,7 @@ def camera_settings():
 
     return camera_captured, hands, hands_detector, hands_drawing
 
-def hand_controller(camera_captured, window_width, hands, hands_detector, hands_drawing, x_pos):
+def hand_controller(camera_captured, window_width, hands, hands_detector, hands_drawing, x_pos, x_boundaries):
     _, frame = camera_captured.read() # Capture the video frame by frame
     frame = cv2.flip(frame, 1)
 
@@ -43,7 +43,7 @@ def hand_controller(camera_captured, window_width, hands, hands_detector, hands_
                                 radius = 5, color = (0, 0, 255),
                                 thickness = -1)
                         #print("Movement")
-                        fixed_x = int(np.interp(center_x, [0, window_width], [0, 10]))
+                        fixed_x = int(np.interp(center_x, [0, window_width], [x_boundaries[0], x_boundaries[1]+1]))
                     elif ((not (y[8] > y[5] and y[12] > y[9] and y[16] > y[13] 
                         and y[20] > y[17])) and ((x[0] > x[3] > x[4])
                                                 or (x[0] < x[3] < x[4]))):
