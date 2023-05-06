@@ -1,6 +1,9 @@
 import pygame
 import random
 import tetrominos as tt
+from camera import *
+
+
 
 # creating the data structure for pieces
 # setting up global vars
@@ -165,8 +168,6 @@ def draw_window(surface, grid, score = 0):
 
     surface.blit(label, (sx + 10, sy - 90))
 
-
-
     for i in range(len(grid)):
         for j in range(len(grid[i])):
             pygame.draw.rect(surface, grid[i][j], (topLeftX + j*blockSize, topLeftY + i*blockSize, blockSize, blockSize), 0)
@@ -175,6 +176,12 @@ def draw_window(surface, grid, score = 0):
 
     draw_grid(surface, grid)
     #pygame.display.update()
+
+def get_direction(old_x, new_x):
+    if new_x - old_x > 0:
+        return "right"
+    else:
+        return "left"
 
 def main(win):
     run = True
@@ -189,8 +196,18 @@ def main(win):
     levelTime = 0
     score = 0
 
+    # Direction
+    old_hand_position = 5
+
+    # Camera
+    camera_captured, hands, hands_detector, hands_drawing = camera_settings()
+    window_width = camera_captured.get(3)
+
     while run:
-        
+        hand_position = hand_controller(camera_captured, window_width, hands, hands_detector, hands_drawing, currentPiece.x)
+        if hand_position >=9:
+            hand_position = 9
+
         grid = create_grid(lockedPositions)
         fallTime += clock.get_rawtime()
         levelTime += clock.get_rawtime()
@@ -207,21 +224,36 @@ def main(win):
             if not(valid_space(currentPiece, grid)) and currentPiece.y > 0:
                 currentPiece.y -= 1
                 changePiece = True
+        
+        currentPiece.x = hand_position
+        if not(valid_space(currentPiece, grid)):
+            direction = get_direction(currentPiece.x, old_hand_position)
+            if(direction == "right"):
+                currentPiece.x -= 1
+                print("Right")
+            else:
+                print("Left")
+                currentPiece.x += 1
+
+        print (currentPiece.x, hand_position)
+
+        old_hand_position = hand_position
+
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
 
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT:
-                    currentPiece.x  -= 1
-                    if not(valid_space(currentPiece, grid)):
-                        currentPiece.x += 1
+                # if event.key == pygame.K_LEFT:
+                #     currentPiece.x  -= 1
+                #     if not(valid_space(currentPiece, grid)):
+                #         currentPiece.x += 1
 
-                if event.key == pygame.K_RIGHT:
-                    currentPiece.x  += 1
-                    if not(valid_space(currentPiece, grid)):
-                        currentPiece.x -= 1
+                # if event.key == pygame.K_RIGHT:
+                #     currentPiece.x  += 1
+                #     if not(valid_space(currentPiece, grid)):
+                #         currentPiece.x -= 1
                 if event.key == pygame.K_DOWN:
                     currentPiece.y  += 1
                     if not(valid_space(currentPiece, grid)):
