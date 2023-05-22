@@ -101,8 +101,14 @@ def draw_grid(surface, grid, topLeftX, topLeftY, playHeight, playWidth,
                              (sx + j * blockSize, sy + playHeight))
 
 
-def clear_rows(grid, locked):
-    """"""
+def clear_rows(grid, locked, destruction_sound):
+    """When a row is completed, it destroys the row and plays a sound.
+    
+    Inputs:
+    grid -> array with the game's grid
+    locked -> array with the locked positions.
+    destruction_sound -> sound to be played when destroyed.
+    """
 
     inc = 0
     for i in range(len(grid) - 1, -1, -1):
@@ -111,6 +117,8 @@ def clear_rows(grid, locked):
         if (0, 0, 0) not in row:
             inc += 1
             ind = i
+            
+            pygame.mixer.Sound.play(destruction_sound)
 
             for j in range(len(row)):
                 try:

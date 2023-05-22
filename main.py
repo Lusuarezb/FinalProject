@@ -10,13 +10,27 @@ from piece import *
 from window import *
 
 # Global Variables
-s_width = 1600     # Width of window
-s_height = 900     # Height of window
-play_width = 300   # Total width of the box where pieces are falling
+s_width = 1600  # Width of window
+s_height = 900  # Height of window
+play_width = 300  # Total width of the box where pieces are falling
 play_height = 600  # Total height of the box where pieces are falling
-blockSize = 30     # Size of the block, this size makes the box have 10x20 blocks
+blockSize = 30  # Size of the block, this size makes the box have 10x20 blocks
 top_left_x = (s_width - play_width) // 2  # Top left position of the "play" window
-top_left_y = s_height - play_height       # Top left position of the "play" window
+top_left_y = s_height - play_height  # Top left position of the "play" window
+
+win = pygame.display.set_mode((s_width, s_height)) # Surface object to display everything
+
+pygame.mixer.init() 
+pygame.mixer.music.load('media/Tetris_theme.mp3')
+# pygame.mixer.music.set_volume(0.1)
+lose_sound = pygame.mixer.Sound('media/Lose.mp3')
+destruction_sound = pygame.mixer.Sound('media/Destruction.mp3')
+destruction_sound.set_volume(0.05)
+lose_sound.set_volume(0.1)
+
+pygame.font.init() 
+pygame.display.set_caption("Tetris") # Name of the game window
+
 
 def main(win):
     """Main execution of the game.
@@ -24,6 +38,7 @@ def main(win):
     Inputs:
     win  surface object with the screen to display.
     """
+
     # Variables needed to run the game
     run = True 
     locked_positions = {}
@@ -33,10 +48,14 @@ def main(win):
     next_piece = get_shape()
     clock = pygame.time.Clock() 
     fall_time = 0
-    fall_speed = 0.27
+    fall_speed_real = 0.27
+    fall_speed = fall_speed_real
     level_time = 0
     score = 0
     old_hand_position = 5 # This is needed to keep the piece in the position it was before the hand disappears or moves
+
+    pygame.mixer.music.set_volume(0.1)
+    pygame.mixer.music.play()
 
     # Camera
     camera_captured, hands, hands_detector, hands_drawing = camera_settings()
@@ -44,6 +63,7 @@ def main(win):
 
     # Main loop that runs the game
     while run:
+        print(pygame.mixer.music.get_volume())
         # List that contains the valid positions of the current piece
         current_piece_position_array = (
             shape_valid_positions[shapes.index(current_piece.shape)]
@@ -58,10 +78,17 @@ def main(win):
             current_piece_position_array[current_piece.rotation 
                                          % len(current_piece_position_array)]
         )
-        # Position of the hand, this determines the position of the piece
-        hand_position = hand_controller(camera_captured, window_width, hands,
-                                        hands_detector, hands_drawing,
-                                        current_piece.x, position_values)
+        # Position of the hand to determine the position of the piece and
+        # speed of the piece.
+        hand_position, fall_speed_down = hand_controller(
+                                         camera_captured,
+                                         window_width, hands,
+                                         hands_detector, hands_drawing,
+                                         current_piece.x, position_values,
+                                         fall_speed
+        )
+
+        fall_speed = fall_speed_down
 
         # Fixing the position of the hand in case it goes out of bounds
         if hand_position >= (max_position_value + 1):
@@ -73,7 +100,8 @@ def main(win):
         level_time += clock.get_rawtime() # Time to increase the difficulty
         clock.tick()
 
-        current_piece.x = hand_position # Moving the piece where the hand is
+        if fall_speed != 0.1:
+            current_piece.x = hand_position # Moving the piece where the hand is
 
         # Increasing level difficulty every 5 seconds
         if level_time / 1000 > 5:
@@ -96,9 +124,7 @@ def main(win):
 
             if(direction == "right"):
                 current_piece.x -= 1
-                print("Right")
             else:
-                print("Left")
                 current_piece.x += 1
 
         # Position of the piece in the previous frame
@@ -113,11 +139,11 @@ def main(win):
             # Keyboard inputs
             if event.type == pygame.KEYDOWN:
                 # Make the piece fall faster when pressing DOWN key
-                if event.key == pygame.K_DOWN:
-                    current_piece.y  += 1
+                # if event.key == pygame.K_DOWN:
+                #     current_piece.y  += 1
 
-                    if not(valid_space(current_piece, grid)):
-                        current_piece.y -= 1
+                #     if not(valid_space(current_piece, grid)):
+                #         current_piece.y -= 1
 
                 # Make the piece rotate when pressing UP key
                 if event.key == pygame.K_UP:
@@ -144,7 +170,8 @@ def main(win):
             current_piece = next_piece
             next_piece = get_shape()
             change_piece = False
-            score += clear_rows(grid, locked_positions) * 10
+            fall_speed = fall_speed_real  # Reset the speed.
+            score += clear_rows(grid, locked_positions, destruction_sound) * 10
 
         # Draw the game window
         draw_window(top_left_x, top_left_y, play_height, play_width, blockSize, win,
@@ -158,11 +185,15 @@ def main(win):
 
         # Check if the player lost the game
         if check_lost(locked_positions):
+            pygame.mixer.music.stop()
+            pygame.mixer.Sound.play(lose_sound)
+
             draw_text_middle(win, "You Lost!", 80, (255, 255, 255), top_left_x,
                              top_left_y, play_height, play_width)
             pygame.display.update()
             pygame.time.delay(1500)
             run = False
+
 
 def main_menu(win):
     """Displays the main menu of the game.
@@ -172,6 +203,7 @@ def main_menu(win):
     """
 
     run = True
+
     while run:
         win.fill((0, 0, 0)) # Black background
 
@@ -191,8 +223,4 @@ def main_menu(win):
     pygame.display.quit()
 
 
-
-win = pygame.display.set_mode((s_width, s_height)) # Surface object to display everything
-pygame.font.init() 
-pygame.display.set_caption("Tetris") # Name of the game window
-main_menu(win)  #Start
+main_menu(win)  # Start
