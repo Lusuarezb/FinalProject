@@ -13,12 +13,18 @@ top_left_y = s_height - play_height  # Top left position of the "play" window
 
 win = pygame.display.set_mode((s_width, s_height)) # Surface object to display everything
 
-pygame.mixer.init() 
+pygame.mixer.init()
 pygame.mixer.music.load('media/Normal/Tetris_theme_normal.mp3')
+
+# Sounds
+clear_row_sound = pygame.mixer.Sound('media/Normal/Clear_row.mp3')
+clear_row_sound.set_volume(0.3)
 lose_sound = pygame.mixer.Sound('media/Normal/Lose.mp3')
-destruction_sound = pygame.mixer.Sound('media/Normal/Clear_row.mp3')
-destruction_sound.set_volume(0.05)
 lose_sound.set_volume(0.1)
+place_sound = pygame.mixer.Sound('media/Normal/Place.mp3')
+place_sound.set_volume(0.1)
+rotate_sound = pygame.mixer.Sound('media/Normal/Rotate.mp3')
+rotate_sound.set_volume(0.5)
 
 pygame.font.init()
 pygame.display.set_caption("Tetris") # Name of the game window
@@ -144,6 +150,7 @@ def main(win):
                 # Make the piece rotate when pressing UP key
                 if event.key == pygame.K_UP:
                     current_piece.rotation  += 1
+                    pygame.mixer.Sound.play(rotate_sound)
 
                     if not(valid_space(current_piece, grid)):
                         current_piece.rotation -= 1
@@ -156,7 +163,7 @@ def main(win):
             x, y = shapePos[i]
             if y > -1:
                 grid[y][x] = current_piece.color
-        
+
         # Lock the current piece in the grid and get the next one
         if change_piece:
             for pos in shapePos:
@@ -167,7 +174,8 @@ def main(win):
             next_piece = get_shape()
             change_piece = False
             fall_speed = fall_speed_real  # Reset the speed.
-            score += clear_rows(grid, locked_positions, destruction_sound) * 10
+            score += clear_rows(grid, locked_positions, clear_row_sound) * 10
+            pygame.mixer.Sound.play(place_sound)
 
         # Draw the game window
         draw_window(top_left_x, top_left_y, play_height, play_width, blockSize,
