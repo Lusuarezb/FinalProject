@@ -168,7 +168,6 @@ def draw_window(topLeftX, topLeftY, playHeight, playWidth, blockSize, surface, g
                 score = 0):
     """"""
 
-    surface.fill((0, 0, 0))
     pygame.font.init()
     font = pygame.font.SysFont('comicsans', 60)
     label = font.render("Tetris", 1, (255, 255, 255))
@@ -215,3 +214,12 @@ def get_direction(old_x, new_x):
         return "right"
     else:
         return "left"
+
+
+def convert_frame(frame):
+    """Converts the given frame to video surface for pygame."""
+
+    video_surf = pygame.image.frombuffer(
+              frame.tobytes(), frame.shape[1::-1], "BGR"
+    )
+    return video_surf

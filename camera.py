@@ -21,7 +21,7 @@ def camera_settings():
 
 
 def hand_controller(camera_captured, window_width, hands, hands_detector,
-                    hands_drawing, x_pos, x_boundaries, fall_speed):
+                    hands_drawing, x_pos, x_boundaries, fall_speed_real):
     """Controls the hand's movement and returns the corresponding movement.
     
     Inputs:
@@ -44,7 +44,7 @@ def hand_controller(camera_captured, window_width, hands, hands_detector,
     image.flags.writeable = False
     results = hands.process(image)
     fixed_x = x_pos
-    fall_speed_down = fall_speed
+    fall_speed_down = fall_speed_real
 
     if results.multi_hand_landmarks: # Hand detected
         for hand_side in results.multi_hand_landmarks:
@@ -67,12 +67,13 @@ def hand_controller(camera_captured, window_width, hands, hands_detector,
                                 [x_boundaries[0], x_boundaries[1] + 1]
                             )
                         )
+                        fall_speed_down = fall_speed_real
                         # print("Open")
 
                     # Hand gesture of a closed fist.
                     elif ((y[8] < y[5] and y[12] < y[9] and y[16] < y[13] 
                         and y[20] < y[17]) and (y[3] > y[2])):
-                        fall_speed_down = 0.1
+                        fall_speed_down = 0.05
                         # print("Down")
                     else:  # No gesture detected.
                         # print("No gesture")

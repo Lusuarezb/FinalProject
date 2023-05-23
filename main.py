@@ -1,10 +1,3 @@
-# TODO:
-# Comentarios en Ingles - Luis
-# Snake Case - Luis 
-# 80 Caracteres horizontal - David
-# Separar en scripts - David
-# Espaciado entre operadores y valores - David
-
 from camera import *
 from piece import *
 from window import *
@@ -21,14 +14,13 @@ top_left_y = s_height - play_height  # Top left position of the "play" window
 win = pygame.display.set_mode((s_width, s_height)) # Surface object to display everything
 
 pygame.mixer.init() 
-pygame.mixer.music.load('media/Tetris_theme.mp3')
-# pygame.mixer.music.set_volume(0.1)
-lose_sound = pygame.mixer.Sound('media/Lose.mp3')
-destruction_sound = pygame.mixer.Sound('media/Destruction.mp3')
+pygame.mixer.music.load('media/Normal/Tetris_theme_normal.mp3')
+lose_sound = pygame.mixer.Sound('media/Normal/Lose.mp3')
+destruction_sound = pygame.mixer.Sound('media/Normal/Clear_row.mp3')
 destruction_sound.set_volume(0.05)
 lose_sound.set_volume(0.1)
 
-pygame.font.init() 
+pygame.font.init()
 pygame.display.set_caption("Tetris") # Name of the game window
 
 
@@ -61,9 +53,20 @@ def main(win):
     camera_captured, hands, hands_detector, hands_drawing = camera_settings()
     window_width = camera_captured.get(3)
 
+    video_background = cv2.VideoCapture("media/Video.mp4")
+
     # Main loop that runs the game
     while run:
-        print(pygame.mixer.music.get_volume())
+        # Video background
+        ret, frame = video_background.read()
+        if not ret:
+            video_background.set(cv2.CAP_PROP_POS_FRAMES, 0)
+            continue
+        
+        frame = cv2.resize(frame, (s_width, s_height))
+        frame_surface = convert_frame(frame)
+        win.blit(frame_surface, (0, 0))
+
         # List that contains the valid positions of the current piece
         current_piece_position_array = (
             shape_valid_positions[shapes.index(current_piece.shape)]
@@ -85,7 +88,7 @@ def main(win):
                                          window_width, hands,
                                          hands_detector, hands_drawing,
                                          current_piece.x, position_values,
-                                         fall_speed
+                                         fall_speed_real
         )
 
         fall_speed = fall_speed_down
@@ -100,8 +103,7 @@ def main(win):
         level_time += clock.get_rawtime() # Time to increase the difficulty
         clock.tick()
 
-        if fall_speed != 0.1:
-            current_piece.x = hand_position # Moving the piece where the hand is
+        current_piece.x = hand_position # Moving the piece where the hand is
 
         # Increasing level difficulty every 5 seconds
         if level_time / 1000 > 5:
@@ -134,17 +136,11 @@ def main(win):
         for event in pygame.event.get():
             # Quit when you click on the X button
             if event.type == pygame.QUIT:
+                pygame.mixer.music.stop()
                 run = False
             
             # Keyboard inputs
             if event.type == pygame.KEYDOWN:
-                # Make the piece fall faster when pressing DOWN key
-                # if event.key == pygame.K_DOWN:
-                #     current_piece.y  += 1
-
-                #     if not(valid_space(current_piece, grid)):
-                #         current_piece.y -= 1
-
                 # Make the piece rotate when pressing UP key
                 if event.key == pygame.K_UP:
                     current_piece.rotation  += 1
@@ -174,13 +170,14 @@ def main(win):
             score += clear_rows(grid, locked_positions, destruction_sound) * 10
 
         # Draw the game window
-        draw_window(top_left_x, top_left_y, play_height, play_width, blockSize, win,
-                    grid, score)
+        draw_window(top_left_x, top_left_y, play_height, play_width, blockSize,
+                    win, grid, score)
         
         # Draw the next shape in the right of the screen
-        draw_next_shape(next_piece, win, top_left_x, top_left_y, play_height, play_width,
-                        blockSize)
+        draw_next_shape(next_piece, win, top_left_x, top_left_y, play_height,
+                        play_width, blockSize)
         
+        pygame.display.flip()  # Show the video background.
         pygame.display.update() # Update to show the changes made
 
         # Check if the player lost the game
