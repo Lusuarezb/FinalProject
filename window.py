@@ -160,7 +160,6 @@ def draw_next_shape(shape, surface, topLeftX, topLeftY, playHeight, playWidth,
                                  (int(sx + j * 30), int(sy + i * 30), 30, 30),
                                  1)
                 
-    
     surface.blit(label, (sx + 10, sy - 50))
 
 
@@ -173,7 +172,8 @@ def draw_window(topLeftX, topLeftY, playHeight, playWidth, blockSize, surface, g
     label = font.render("Tetris", 1, (255, 255, 255))
 
     surface.blit(label,
-                 (topLeftX + playWidth / 2 - (label.get_width() / 2), 30)) # Tetris 
+                 (topLeftX + playWidth / 2 - (label.get_width() / 2), 30)
+    )
 
     # Score
     font = pygame.font.SysFont("comicsans", 30)
@@ -195,7 +195,6 @@ def draw_window(topLeftX, topLeftY, playHeight, playWidth, blockSize, surface, g
 
     draw_grid(surface, grid, topLeftX, topLeftY, playHeight, playWidth,
               blockSize)
-    #pygame.display.update()
 
 
 def get_direction(old_x, new_x):
