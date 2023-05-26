@@ -3,13 +3,18 @@ from piece import *
 from window import *
 
 # Global Variables
-s_width = 1600  # Width of window
+s_width = 900 # Width of window
 s_height = 900  # Height of window
 play_width = 300  # Total width of the box where pieces are falling
 play_height = 600  # Total height of the box where pieces are falling
+
 blockSize = 30  # Size of the block, this size makes the box have 10x20 blocks
+
 top_left_x = (s_width - play_width) // 2  # Top left position of the "play" window
-top_left_y = s_height - play_height  # Top left position of the "play" window
+top_left_y = s_height - play_height # Top left position of the "play" window
+
+guide_left_x = top_left_x
+guide_left_y = top_left_y - 50
 
 win = pygame.display.set_mode((s_width, s_height)) # Surface object to display everything
 
@@ -41,6 +46,7 @@ def main(win):
     run = True 
     locked_positions = {}
     grid = create_grid(locked_positions)
+    guide_grid = create_guide_grid()
     change_piece = False
     current_piece = get_shape() 
     next_piece = get_shape()
@@ -53,13 +59,13 @@ def main(win):
     old_hand_position = 5 # This is needed to keep the piece in the position it was before the hand disappears or moves
 
     pygame.mixer.music.set_volume(0.1)
-    pygame.mixer.music.play()
+    pygame.mixer.music.play(loops=-1)
 
     # Camera
     camera_captured, hands, hands_detector, hands_drawing = camera_settings()
     window_width = camera_captured.get(3)
 
-    video_background = cv2.VideoCapture("media/Video.mp4")
+    video_background = cv2.VideoCapture("media/Normal/Background.mp4")
 
     # Main loop that runs the game
     while run:
@@ -109,7 +115,17 @@ def main(win):
         level_time += clock.get_rawtime() # Time to increase the difficulty
         clock.tick()
 
-        current_piece.x = hand_position # Moving the piece where the hand is
+        if(current_piece.x != hand_position):
+            dif_pos = hand_position - current_piece.x
+            if (dif_pos > 0):
+                current_piece.x += 1
+                if not(valid_space(current_piece, grid)):
+                    current_piece.x -= 1
+
+            else:
+                current_piece.x -= 1
+                if not(valid_space(current_piece, grid)):
+                    current_piece.x += 1
 
         # Increasing level difficulty every 5 seconds
         if level_time / 1000 > 5:
@@ -127,13 +143,13 @@ def main(win):
                 change_piece = True
         
         # Verifiying if the piece is in a valid space
-        if not(valid_space(current_piece, grid)):
-            direction = get_direction(current_piece.x, old_hand_position)
+        # if not(valid_space(current_piece, grid)):
+        #     direction = get_direction(old_hand_position, current_piece.x)
 
-            if(direction == "right"):
-                current_piece.x -= 1
-            else:
-                current_piece.x += 1
+        #     if(direction == "right"):
+        #         current_piece.x -= 1
+        #     else:
+        #         current_piece.x += 1
 
         # Position of the piece in the previous frame
         old_hand_position = hand_position
@@ -156,17 +172,25 @@ def main(win):
                         current_piece.rotation -= 1
 
         # Convert the piece from a list of dots and 0s to valid positions
-        shapePos = convert_shape_format(current_piece)
+        shape_pos = convert_shape_format(current_piece)
         
         # Color the grid with the current piece color
-        for i in range(len(shapePos)):
-            x, y = shapePos[i]
+        for i in range(len(shape_pos)):
+            x, y = shape_pos[i]
             if y > -1:
                 grid[y][x] = current_piece.color
 
+        # Color the guide grid with the current hand position
+        for i in range(len(guide_grid)):
+            for j in range(len(guide_grid[i])):
+                if j == hand_position:
+                    guide_grid[i][j] = (255, 255, 255)
+                else:
+                    guide_grid[i][j] = (0, 0, 0)
+
         # Lock the current piece in the grid and get the next one
         if change_piece:
-            for pos in shapePos:
+            for pos in shape_pos:
                 p = (pos [0], pos[1])
                 locked_positions[p] = current_piece.color
             
@@ -179,7 +203,7 @@ def main(win):
 
         # Draw the game window
         draw_window(top_left_x, top_left_y, play_height, play_width, blockSize,
-                    win, grid, score)
+                    win, grid, guide_grid, score)
         
         # Draw the next shape in the right of the screen
         draw_next_shape(next_piece, win, top_left_x, top_left_y, play_height,

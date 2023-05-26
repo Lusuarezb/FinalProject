@@ -8,6 +8,10 @@ shapes: S, Z, I, O, J, L, T
 represented in order by 0 - 6
 """
 
+def create_guide_grid():
+    grid = [[(0, 0, 0) for _ in range(10)] for _ in range(1)]
+    return grid
+
 def create_grid(locked_pos = {}):
     """Creates the game's grid positions. The grid consists of each cell, and
     each cell contains...
@@ -92,6 +96,7 @@ def draw_grid(surface, grid, topLeftX, topLeftY, playHeight, playWidth,
 
     sx = topLeftX
     sy = topLeftY
+    guide_sy = sy - 50
 
     for i in range(len(grid)):
         pygame.draw.line(surface, (128, 128, 128), (sx, sy + i * blockSize),
@@ -100,6 +105,12 @@ def draw_grid(surface, grid, topLeftX, topLeftY, playHeight, playWidth,
             pygame.draw.line(surface, (128, 128, 128), (sx + j * blockSize, sy),
                              (sx + j * blockSize, sy + playHeight))
 
+def draw_guide_grid(surface, guide_grid, topLeftX, topLeftY, blockSize):
+    sx = topLeftX
+    sy = topLeftY - 50
+    for i in range(len(guide_grid)):
+        for j in range(len(guide_grid[i])):
+            pygame.draw.rect(surface,(128,128,128),(int(sx + j * blockSize), int(sy + i * blockSize), blockSize, blockSize), 1)
 
 def clear_rows(grid, locked, destruction_sound):
     """When a row is completed, it destroys the row and plays a sound.
@@ -163,7 +174,7 @@ def draw_next_shape(shape, surface, topLeftX, topLeftY, playHeight, playWidth,
     surface.blit(label, (sx + 10, sy - 50))
 
 
-def draw_window(topLeftX, topLeftY, playHeight, playWidth, blockSize, surface, grid,
+def draw_window(topLeftX, topLeftY, playHeight, playWidth, blockSize, surface, grid, guide_grid,
                 score = 0):
     """"""
 
@@ -181,6 +192,7 @@ def draw_window(topLeftX, topLeftY, playHeight, playWidth, blockSize, surface, g
 
     sx = topLeftX + playWidth + 50
     sy = topLeftY + playHeight / 2 - 150
+    syy = topLeftY - 50
 
     surface.blit(label, (sx + 10, sy - 90))
 
@@ -189,12 +201,23 @@ def draw_window(topLeftX, topLeftY, playHeight, playWidth, blockSize, surface, g
             pygame.draw.rect(surface, grid[i][j],
                              (topLeftX + j * blockSize,
                               topLeftY + i * blockSize, blockSize, blockSize), 0)
+            
+    for i in range(len(guide_grid)):
+        for j in range(len(guide_grid[i])):
+            pygame.draw.rect(surface, guide_grid[i][j],
+                             (topLeftX + j * blockSize,
+                              syy + i * blockSize, blockSize, blockSize), 0)
 
+    pygame.draw.rect(surface, (255, 0, 0),
+                     (topLeftX, topLeftY, playWidth, playHeight), 4)
+    
     pygame.draw.rect(surface, (255, 0, 0),
                      (topLeftX, topLeftY, playWidth, playHeight), 4)
 
     draw_grid(surface, grid, topLeftX, topLeftY, playHeight, playWidth,
               blockSize)
+    
+    draw_guide_grid(surface, guide_grid, topLeftX, topLeftY, blockSize)
 
 
 def get_direction(old_x, new_x):
