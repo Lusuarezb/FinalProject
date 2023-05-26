@@ -1,13 +1,20 @@
+import os
+
 from camera import *
 from piece import *
 from window import *
 
+# Window size and configuration variables.
+s_width, s_height = 900, 900  # Width and height of the window.
+user = windll.user32
+screen_width, screen_height = (user.GetSystemMetrics(0),
+                               user.GetSystemMetrics(1))
+x_position, y_position = int(screen_width / 2), int((screen_height - s_height) / 2)  # x and y position of the window.
+os.environ['SDL_VIDEO_WINDOW_POS'] = f"{x_position}, {y_position}"
+
 # Global Variables
-s_width = 900 # Width of window
-s_height = 900  # Height of window
 play_width = 300  # Total width of the box where pieces are falling
 play_height = 600  # Total height of the box where pieces are falling
-
 blockSize = 30  # Size of the block, this size makes the box have 10x20 blocks
 
 top_left_x = (s_width - play_width) // 2  # Top left position of the "play" window

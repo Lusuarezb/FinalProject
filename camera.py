@@ -1,3 +1,4 @@
+from ctypes import windll
 import cv2
 import mediapipe as mp
 import numpy as np
@@ -37,14 +38,23 @@ def hand_controller(camera_captured, window_width, hands, hands_detector,
     x position for the piece to move.
     """
     
-    _, frame = camera_captured.read() # Capture the video frame by frame
+    _, frame = camera_captured.read()  # Capture the video frame by frame
     frame = cv2.flip(frame, 1)
-
     image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     image.flags.writeable = False
     results = hands.process(image)
     fixed_x = x_pos
     fall_speed_down = fall_speed_real
+
+    window_name = "Camera"
+    cv2.namedWindow(window_name)
+    cv2.setWindowProperty(window_name, cv2.WND_PROP_AUTOSIZE, cv2.WINDOW_AUTOSIZE)
+
+    user = windll.user32
+    screen_width, screen_height = (
+        user.GetSystemMetrics(0), user.GetSystemMetrics(1)
+    )
+    window_width, window_height = cv2.getWindowImageRect('Camera')[2:]
 
     if results.multi_hand_landmarks: # Hand detected
         for hand_side in results.multi_hand_landmarks:
@@ -68,24 +78,24 @@ def hand_controller(camera_captured, window_width, hands, hands_detector,
                             )
                         )
                         fall_speed_down = fall_speed_real
-                        # print("Open")
 
                     # Hand gesture of a closed fist.
                     elif ((y[8] < y[5] and y[12] < y[9] and y[16] < y[13] 
                         and y[20] < y[17]) and (y[3] > y[2])):
                         fall_speed_down = 0.05
-                        # print("Down")
+    
                     else:  # No gesture detected.
-                        # print("No gesture")
                         pass
 
             hands_drawing.draw_landmarks(frame, hand_side,
                                         hands_detector.HAND_CONNECTIONS)
     else: # No hand detected
         fixed_x = x_pos
-        # print("No hand detected")
 
-    cv2.imshow('Camera', frame) # Display the live camera
+    print(int(window_width * 0.9))
+    cv2.moveWindow(window_name, (int(screen_width / 2) - int(window_width * 1.05)),
+                   int((screen_height - window_height) / 2))
+    cv2.imshow(window_name, frame) # Display the live camera
 
     return fixed_x, fall_speed_down
 
