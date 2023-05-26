@@ -1,7 +1,9 @@
 import os
+import random
 
 from camera import *
 from piece import *
+from themes import *
 from window import *
 
 # Window size and configuration variables.
@@ -23,26 +25,28 @@ top_left_y = s_height - play_height # Top left position of the "play" window
 guide_left_x = top_left_x
 guide_left_y = top_left_y - 50
 
+themes_list = ["Normal", "Metal"]
+
 win = pygame.display.set_mode((s_width, s_height)) # Surface object to display everything
 
 pygame.mixer.init()
 pygame.mixer.music.load('media/Normal/Tetris_theme_normal.mp3')
 
 # Sounds
-clear_row_sound = pygame.mixer.Sound('media/Normal/Clear_row.mp3')
-clear_row_sound.set_volume(0.3)
-lose_sound = pygame.mixer.Sound('media/Normal/Lose.mp3')
-lose_sound.set_volume(0.1)
-place_sound = pygame.mixer.Sound('media/Normal/Place.mp3')
-place_sound.set_volume(0.1)
-rotate_sound = pygame.mixer.Sound('media/Normal/Rotate.mp3')
-rotate_sound.set_volume(0.5)
+# clear_row_sound = pygame.mixer.Sound('media/Normal/Clear_row.mp3')
+# clear_row_sound.set_volume(0.3)
+# lose_sound = pygame.mixer.Sound('media/Normal/Lose.mp3')
+# lose_sound.set_volume(0.1)
+# place_sound = pygame.mixer.Sound('media/Normal/Place.mp3')
+# place_sound.set_volume(0.1)
+# rotate_sound = pygame.mixer.Sound('media/Normal/Rotate.mp3')
+# rotate_sound.set_volume(0.5)
 
 pygame.font.init()
 pygame.display.set_caption("Tetris") # Name of the game window
 
 
-def main(win):
+def main(win, theme):
     """Main execution of the game.
 
     Inputs:
@@ -63,7 +67,9 @@ def main(win):
     fall_speed = fall_speed_real
     level_time = 0
     score = 0
-    old_hand_position = 5 # This is needed to keep the piece in the position it was before the hand disappears or moves
+    sounds = select_sounds(theme)
+    colors = select_colors(theme)
+    # old_hand_position = 5 # This is needed to keep the piece in the position it was before the hand disappears or moves
 
     pygame.mixer.music.set_volume(0.1)
     pygame.mixer.music.play(loops=-1)
@@ -173,7 +179,7 @@ def main(win):
                 # Make the piece rotate when pressing UP key
                 if event.key == pygame.K_UP:
                     current_piece.rotation  += 1
-                    pygame.mixer.Sound.play(rotate_sound)
+                    pygame.mixer.Sound.play(sounds["rotate"])
 
                     if not(valid_space(current_piece, grid)):
                         current_piece.rotation -= 1
@@ -205,8 +211,8 @@ def main(win):
             next_piece = get_shape()
             change_piece = False
             fall_speed = fall_speed_real  # Reset the speed.
-            score += clear_rows(grid, locked_positions, clear_row_sound) * 10
-            pygame.mixer.Sound.play(place_sound)
+            score += clear_rows(grid, locked_positions, sounds["clear_row"]) * 10
+            pygame.mixer.Sound.play(sounds["place"])
 
         # Draw the game window
         draw_window(top_left_x, top_left_y, play_height, play_width, blockSize,
@@ -222,7 +228,7 @@ def main(win):
         # Check if the player lost the game.
         if check_lost(locked_positions):
             pygame.mixer.music.stop()
-            pygame.mixer.Sound.play(lose_sound)
+            pygame.mixer.Sound.play(sounds["lose"])
 
             draw_text_middle(win, "You Lost!", 80, (255, 255, 255), top_left_x,
                              top_left_y, play_height, play_width)
@@ -239,6 +245,7 @@ def main_menu(win):
     """
 
     run = True
+    theme = ""
     # Camera settings for the main menu.
     camera_captured_menu, window_name_menu = menu_camera_settings()
 
@@ -257,9 +264,16 @@ def main_menu(win):
             # Quit when X is pressed on the game window
             if event.type == pygame.QUIT:
                 run = False
+
+            if event.type == pygame.MOUSEBUTTONUP:
+                random_number = random.randint(0, 1)
+                print(random_number)
+                theme = themes_list[random_number]
+                print(theme)
+
             # Run the game when any key is pressed
             if event.type == pygame.KEYDOWN:
-                main(win)
+                main(win, theme)
                 # Change the camera when the game is over.
                 camera_captured_menu, window_name_menu = menu_camera_settings()
 
