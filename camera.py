@@ -4,6 +4,36 @@ import mediapipe as mp
 import numpy as np
 
 
+def menu_camera_settings():
+    camera_captured = cv2.VideoCapture(0) # Set camera
+    window_name = "Camera"
+    cv2.namedWindow(window_name)
+    cv2.setWindowProperty(window_name, cv2.WND_PROP_AUTOSIZE,
+                          cv2.WINDOW_AUTOSIZE)
+
+    return camera_captured, window_name
+
+
+def menu_camera_window(camera_captured, window_name):
+    """Displays the camera in a separate window while in the main  menu."""
+
+    ret, frame = camera_captured.read()  # Read a frame from the camera
+    frame = cv2.flip(frame, 1)
+
+    # Check if the frame is empty
+    if ret:
+        user = windll.user32
+        screen_width, screen_height = (
+            user.GetSystemMetrics(0), user.GetSystemMetrics(1)
+        )
+        window_width, window_height = cv2.getWindowImageRect('Camera')[2:]
+        cv2.moveWindow(window_name,
+                       (int(screen_width / 2) - int(window_width * 1.05)),
+                        int((screen_height - window_height) / 2))
+        
+        cv2.imshow(window_name, frame)  # Display the frame in the window
+
+
 def camera_settings():
     """Sets the basic settings for the camera.
     
@@ -48,7 +78,8 @@ def hand_controller(camera_captured, window_width, hands, hands_detector,
 
     window_name = "Camera"
     cv2.namedWindow(window_name)
-    cv2.setWindowProperty(window_name, cv2.WND_PROP_AUTOSIZE, cv2.WINDOW_AUTOSIZE)
+    cv2.setWindowProperty(window_name, cv2.WND_PROP_AUTOSIZE,
+                          cv2.WINDOW_AUTOSIZE)
 
     user = windll.user32
     screen_width, screen_height = (
@@ -92,16 +123,9 @@ def hand_controller(camera_captured, window_width, hands, hands_detector,
     else: # No hand detected
         fixed_x = x_pos
 
-    print(int(window_width * 0.9))
-    cv2.moveWindow(window_name, (int(screen_width / 2) - int(window_width * 1.05)),
+    cv2.moveWindow(window_name,
+                   (int(screen_width / 2) - int(window_width * 1.05)),
                    int((screen_height - window_height) / 2))
     cv2.imshow(window_name, frame) # Display the live camera
 
     return fixed_x, fall_speed_down
-
-
-def camera_window():
-    """Displays the camera in a separate window."""
-
-    camera_captured, hands, hands_detector, hands_drawing = camera_settings()
-    hand_controller(camera_captured, hands, hands_detector, hands_drawing)

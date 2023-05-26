@@ -50,7 +50,7 @@ def main(win):
     """
 
     # Variables needed to run the game
-    run = True 
+    run_game = True 
     locked_positions = {}
     grid = create_grid(locked_positions)
     guide_grid = create_guide_grid()
@@ -75,7 +75,7 @@ def main(win):
     video_background = cv2.VideoCapture("media/Normal/Background.mp4")
 
     # Main loop that runs the game
-    while run:
+    while run_game:
         # Video background
         ret, frame = video_background.read()
         if not ret:
@@ -166,7 +166,7 @@ def main(win):
             # Quit when you click on the X button
             if event.type == pygame.QUIT:
                 pygame.mixer.music.stop()
-                run = False
+                run_game = False
             
             # Keyboard inputs
             if event.type == pygame.KEYDOWN:
@@ -217,9 +217,9 @@ def main(win):
                         play_width, blockSize)
         
         pygame.display.flip()  # Show the video background.
-        pygame.display.update() # Update to show the changes made
+        pygame.display.update() # Update to show the changes made.
 
-        # Check if the player lost the game
+        # Check if the player lost the game.
         if check_lost(locked_positions):
             pygame.mixer.music.stop()
             pygame.mixer.Sound.play(lose_sound)
@@ -228,7 +228,7 @@ def main(win):
                              top_left_y, play_height, play_width)
             pygame.display.update()
             pygame.time.delay(1500)
-            run = False
+            run_game = False
 
 
 def main_menu(win):
@@ -239,6 +239,8 @@ def main_menu(win):
     """
 
     run = True
+    # Camera settings for the main menu.
+    camera_captured_menu, window_name_menu = menu_camera_settings()
 
     while run:
         win.fill((0, 0, 0)) # Black background
@@ -246,6 +248,9 @@ def main_menu(win):
         draw_text_middle(win, "Press any key to play!", 60, (255, 255, 255),
                          top_left_x, top_left_y, play_height, play_width)
         pygame.display.update()
+
+        # Display the camera while in the main menu.
+        menu_camera_window(camera_captured_menu, window_name_menu)
         
         # Events in main menu
         for event in pygame.event.get():
@@ -255,6 +260,8 @@ def main_menu(win):
             # Run the game when any key is pressed
             if event.type == pygame.KEYDOWN:
                 main(win)
+                # Change the camera when the game is over.
+                camera_captured_menu, window_name_menu = menu_camera_settings()
 
     pygame.display.quit()
 
