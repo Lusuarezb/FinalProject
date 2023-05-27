@@ -1,5 +1,4 @@
 import os
-import random
 
 from camera import *
 from piece import *
@@ -26,21 +25,9 @@ guide_left_x = top_left_x
 guide_left_y = top_left_y - 50
 
 themes_list = ["Normal", "Metal"]
+theme_counter = 0
 
 win = pygame.display.set_mode((s_width, s_height)) # Surface object to display everything
-
-pygame.mixer.init()
-pygame.mixer.music.load('media/Normal/Tetris_theme_normal.mp3')
-
-# Sounds
-# clear_row_sound = pygame.mixer.Sound('media/Normal/Clear_row.mp3')
-# clear_row_sound.set_volume(0.3)
-# lose_sound = pygame.mixer.Sound('media/Normal/Lose.mp3')
-# lose_sound.set_volume(0.1)
-# place_sound = pygame.mixer.Sound('media/Normal/Place.mp3')
-# place_sound.set_volume(0.1)
-# rotate_sound = pygame.mixer.Sound('media/Normal/Rotate.mp3')
-# rotate_sound.set_volume(0.5)
 
 pygame.font.init()
 pygame.display.set_caption("Tetris") # Name of the game window
@@ -69,10 +56,8 @@ def main(win, theme):
     score = 0
     sounds = select_sounds(theme)
     colors = select_colors(theme)
-    # old_hand_position = 5 # This is needed to keep the piece in the position it was before the hand disappears or moves
 
-    pygame.mixer.music.set_volume(0.1)
-    pygame.mixer.music.play(loops=-1)
+    pygame.mixer.music.play(loops = -1)
 
     # Camera
     camera_captured, hands, hands_detector, hands_drawing = camera_settings()
@@ -154,15 +139,6 @@ def main(win, theme):
             if not(valid_space(current_piece, grid)) and current_piece.y > 0:
                 current_piece.y -= 1
                 change_piece = True
-        
-        # Verifiying if the piece is in a valid space
-        # if not(valid_space(current_piece, grid)):
-        #     direction = get_direction(old_hand_position, current_piece.x)
-
-        #     if(direction == "right"):
-        #         current_piece.x -= 1
-        #     else:
-        #         current_piece.x += 1
 
         # Position of the piece in the previous frame
         old_hand_position = hand_position
@@ -203,6 +179,8 @@ def main(win, theme):
 
         # Lock the current piece in the grid and get the next one
         if change_piece:
+            pygame.mixer.Sound.play(sounds["place"])
+
             for pos in shape_pos:
                 p = (pos [0], pos[1])
                 locked_positions[p] = current_piece.color
@@ -212,7 +190,6 @@ def main(win, theme):
             change_piece = False
             fall_speed = fall_speed_real  # Reset the speed.
             score += clear_rows(grid, locked_positions, sounds["clear_row"]) * 10
-            pygame.mixer.Sound.play(sounds["place"])
 
         # Draw the game window
         draw_window(top_left_x, top_left_y, play_height, play_width, blockSize,
@@ -245,15 +222,20 @@ def main_menu(win):
     """
 
     run = True
-    theme = ""
+    global theme_counter
+    theme = themes_list[theme_counter % 2]
     # Camera settings for the main menu.
     camera_captured_menu, window_name_menu = menu_camera_settings()
 
     while run:
         win.fill((0, 0, 0)) # Black background
+        mouse_position = pygame.mouse.get_pos()
 
-        draw_text_middle(win, "Press any key to play!", 60, (255, 255, 255),
-                         top_left_x, top_left_y, play_height, play_width)
+        # Displays the buttons.
+        offset = 5
+        start_button_coords = draw_start_button(win, offset)
+        theme_button_coords = draw_theme_button(win, offset, theme)
+
         pygame.display.update()
 
         # Display the camera while in the main menu.
@@ -261,21 +243,32 @@ def main_menu(win):
         
         # Events in main menu
         for event in pygame.event.get():
+            # Checks if the player clicked the start button.
+            if ((event.type == pygame.MOUSEBUTTONDOWN)
+            and (mouse_position[0] >= start_button_coords["left"]
+                 and mouse_position[0] <= start_button_coords["right"])
+            and (mouse_position[1] >= start_button_coords["up"]
+                 and mouse_position[1] <= start_button_coords["down"])):
+                main(win, theme)  # Run the game.
+                # Change the camera when the game is over.
+                camera_captured_menu, window_name_menu = menu_camera_settings()
+
+            # Checks if the player clicked the theme button.
+            if ((event.type == pygame.MOUSEBUTTONDOWN)
+            and (mouse_position[0] >= theme_button_coords["left"]
+                 and mouse_position[0] <= theme_button_coords["right"])
+            and (mouse_position[1] >= theme_button_coords["up"]
+                 and mouse_position[1] <= theme_button_coords["down"])):
+                theme_counter += 1
+
+                if theme_counter >= len(themes_list):
+                    theme_counter = 0
+                
+                theme = themes_list[theme_counter]
+
             # Quit when X is pressed on the game window
             if event.type == pygame.QUIT:
                 run = False
-
-            if event.type == pygame.MOUSEBUTTONUP:
-                random_number = random.randint(0, 1)
-                print(random_number)
-                theme = themes_list[random_number]
-                print(theme)
-
-            # Run the game when any key is pressed
-            if event.type == pygame.KEYDOWN:
-                main(win, theme)
-                # Change the camera when the game is over.
-                camera_captured_menu, window_name_menu = menu_camera_settings()
 
     pygame.display.quit()
 
