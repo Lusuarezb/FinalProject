@@ -2,11 +2,11 @@ import os
 
 from camera import *
 from piece import *
-from themes import *
+from themes import select_sounds, select_colors
 from window import *
 
 # Window size and configuration variables.
-s_width, s_height = 900, 900  # Width and height of the window.
+s_width, s_height = 950, 950  # Width and height of the window.
 user = windll.user32
 screen_width, screen_height = (user.GetSystemMetrics(0),
                                user.GetSystemMetrics(1))
@@ -16,7 +16,7 @@ os.environ['SDL_VIDEO_WINDOW_POS'] = f"{x_position}, {y_position}"
 # Global Variables
 play_width = 300  # Total width of the box where pieces are falling
 play_height = 600  # Total height of the box where pieces are falling
-blockSize = 30  # Size of the block, this size makes the box have 10x20 blocks
+block_size = 30  # Size of the block, this size makes the box have 10x20 blocks
 
 top_left_x = (s_width - play_width) // 2  # Top left position of the "play" window
 top_left_y = s_height - play_height # Top left position of the "play" window
@@ -24,13 +24,15 @@ top_left_y = s_height - play_height # Top left position of the "play" window
 guide_left_x = top_left_x
 guide_left_y = top_left_y - 50
 
-themes_list = ["Normal", "Metal"]
+themes_list = ["normal", "metal"]
 theme_counter = 0
 
 win = pygame.display.set_mode((s_width, s_height)) # Surface object to display everything
 
 pygame.font.init()
-pygame.display.set_caption("Tetris") # Name of the game window
+title_font = pygame.font.Font("media/Tetris_font.otf", 60)
+button_font = pygame.font.Font("media/Tetris_font.otf", 35)
+pygame.display.set_caption("Hand Tetris") # Name of the game window
 
 
 def main(win, theme):
@@ -63,12 +65,13 @@ def main(win, theme):
     camera_captured, hands, hands_detector, hands_drawing = camera_settings()
     window_width = camera_captured.get(3)
 
-    video_background = cv2.VideoCapture("media/Normal/Background.mp4")
+    video_background = cv2.VideoCapture(f"media/{theme}/Background_{theme}.mp4")
 
     # Main loop that runs the game
     while run_game:
         # Video background
         ret, frame = video_background.read()
+
         if not ret:
             video_background.set(cv2.CAP_PROP_POS_FRAMES, 0)
             continue
@@ -140,9 +143,6 @@ def main(win, theme):
                 current_piece.y -= 1
                 change_piece = True
 
-        # Position of the piece in the previous frame
-        old_hand_position = hand_position
-
         # Check game events
         for event in pygame.event.get():
             # Quit when you click on the X button
@@ -155,10 +155,11 @@ def main(win, theme):
                 # Make the piece rotate when pressing UP key
                 if event.key == pygame.K_UP:
                     current_piece.rotation  += 1
-                    pygame.mixer.Sound.play(sounds["rotate"])
 
                     if not(valid_space(current_piece, grid)):
                         current_piece.rotation -= 1
+                    else:
+                        pygame.mixer.Sound.play(sounds["rotate"])
 
         # Convert the piece from a list of dots and 0s to valid positions
         shape_pos = convert_shape_format(current_piece)
@@ -192,12 +193,12 @@ def main(win, theme):
             score += clear_rows(grid, locked_positions, sounds["clear_row"]) * 10
 
         # Draw the game window
-        draw_window(top_left_x, top_left_y, play_height, play_width, blockSize,
-                    win, grid, guide_grid, score)
+        draw_window(top_left_x, top_left_y, play_height, play_width, block_size,
+                    win, grid, guide_grid, theme, score)
         
         # Draw the next shape in the right of the screen
         draw_next_shape(next_piece, win, top_left_x, top_left_y, play_height,
-                        play_width, blockSize)
+                        play_width, block_size, theme)
         
         pygame.display.flip()  # Show the video background.
         pygame.display.update() # Update to show the changes made.
@@ -227,14 +228,22 @@ def main_menu(win):
     # Camera settings for the main menu.
     camera_captured_menu, window_name_menu = menu_camera_settings()
 
+    menu_background = pygame.image.load("media/menu_background.jpg")
+
     while run:
-        win.fill((0, 0, 0)) # Black background
+        # Display the background and title.
+        win.blit(menu_background, (0, 0))
+        game_title = title_font.render("HAND TETRIS", 1, (255, 255, 255))
+        win.blit(game_title,
+                 (top_left_x + play_width / 2 - (game_title.get_width() / 2), 50)
+        )
+
         mouse_position = pygame.mouse.get_pos()
 
-        # Displays the buttons.
+        # Display the buttons.
         offset = 5
-        start_button_coords = draw_start_button(win, offset)
-        theme_button_coords = draw_theme_button(win, offset, theme)
+        start_button_coords = draw_start_button(win, offset, button_font)
+        theme_button_coords = draw_theme_button(win, offset, theme, button_font)
 
         pygame.display.update()
 

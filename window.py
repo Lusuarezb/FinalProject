@@ -1,6 +1,7 @@
 import pygame
 
 from piece import convert_shape_format
+from themes import select_font
 
 """
 10 x 20 square grid
@@ -69,7 +70,7 @@ def check_lost(positions):
     return False
 
 
-def draw_start_button(win, offset):
+def draw_start_button(win, offset, font):
     """Displays the start game button on the main menu.
     
     Inputs:
@@ -84,7 +85,7 @@ def draw_start_button(win, offset):
 
     start_button_color = (255, 255, 255)
     start_button_text_color = (255, 0, 0)
-    font = pygame.font.SysFont('comicsans', 35)
+    # font = pygame.font.SysFont('comicsans', 35)
     start_text = "Start game"
     start_text_width, start_text_height = font.size(start_text)
     start_button_text = font.render(start_text, True,
@@ -104,12 +105,12 @@ def draw_start_button(win, offset):
                              start_text_height + offset * 2),
                      width = 0)
     win.blit(start_button_text, (start_button_coords["left"] + offset,
-              start_button_coords["up"]))
+              start_button_coords["up"] + offset))
 
     return start_button_coords
 
 
-def draw_theme_button(win, offset, theme):
+def draw_theme_button(win, offset, theme, font):
     """Displays the theme selector button on the main menu.
     
     Inputs:
@@ -124,7 +125,7 @@ def draw_theme_button(win, offset, theme):
 
     theme_button_color = (255, 255, 255)
     theme_button_text_color = (0, 0, 255)
-    font = pygame.font.SysFont('comicsans', 25)
+    # font = pygame.font.SysFont('comicsans', 25)
     theme_text = f"Theme selected: {theme}"
     theme_text_width, theme_text_height = font.size(theme_text)
     theme_button_text = font.render(theme_text, True,
@@ -155,8 +156,8 @@ def draw_instructions_button(win):
     return
 
 
-def draw_text_middle(surface, text, size, color, topLeftX, topLeftY, playHeight,
-                     playWidth):
+def draw_text_middle(surface, text, size, color, top_left_x, top_left_y, play_height,
+                     play_width):
     """Writes the given text in the middle of the screen (surface).
     
     Inputs:
@@ -169,13 +170,13 @@ def draw_text_middle(surface, text, size, color, topLeftX, topLeftY, playHeight,
     font = pygame.font.SysFont("comicsans", size, bold = True)
     label = font.render(text, 1, color)
     surface.blit(
-        label, (topLeftX + playWidth / 2 - (label.get_width() / 2),
-                topLeftY + playHeight / 2 - label.get_height() / 2)
+        label, (top_left_x + play_width / 2 - (label.get_width() / 2),
+                top_left_y + play_height / 2 - label.get_height() / 2)
     )
    
 
-def draw_grid(surface, grid, topLeftX, topLeftY, playHeight, playWidth,
-              blockSize):
+def draw_grid(surface, grid, top_left_x, top_left_y, play_height, play_width,
+              block_size):
     """Displays the game's grid in the given surface (screen).
     
     Inputs:
@@ -183,34 +184,34 @@ def draw_grid(surface, grid, topLeftX, topLeftY, playHeight, playWidth,
     grid -> array with the game's grid.
     """
 
-    sx = topLeftX
-    sy = topLeftY
+    sx = top_left_x
+    sy = top_left_y
 
     for i in range(len(grid)):
-        pygame.draw.line(surface, (128, 128, 128), (sx, sy + i * blockSize),
-                         (sx + playWidth, sy + i * blockSize))
+        pygame.draw.line(surface, (128, 128, 128), (sx, sy + i * block_size),
+                         (sx + play_width, sy + i * block_size))
         for j in range(len(grid[i])):
-            pygame.draw.line(surface, (128, 128, 128), (sx + j * blockSize, sy),
-                             (sx + j * blockSize, sy + playHeight))
+            pygame.draw.line(surface, (128, 128, 128), (sx + j * block_size, sy),
+                             (sx + j * block_size, sy + play_height))
 
 
-def draw_guide_grid(surface, guide_grid, topLeftX, topLeftY, blockSize):
+def draw_guide_grid(surface, guide_grid, top_left_x, top_left_y, block_size):
     """Displays the handguide position in a separate grid.
     
     Inputs:
     surface -> display object in which to draw the grid.
     guide_grid -> array with the guide grid.
-    topLeftX -> x position of the top left of the grid.
-    topLeftY -> y position of the top left of the grid.
-    blockSize -> size of each block of the grid.
+    top_left_x -> x position of the top left of the grid.
+    top_left_y -> y position of the top left of the grid.
+    block_size -> size of each block of the grid.
     """
 
-    sx = topLeftX
-    sy = topLeftY - 50
+    sx = top_left_x
+    sy = top_left_y - 50
     for i in range(len(guide_grid)):
         for j in range(len(guide_grid[i])):
-            pygame.draw.rect(surface, (128, 128, 128), (int(sx + j * blockSize), 
-                            int(sy + i * blockSize), blockSize, blockSize), 1)
+            pygame.draw.rect(surface, (128, 128, 128), (int(sx + j * block_size), 
+                            int(sy + i * block_size), block_size, block_size), 1)
 
 
 def clear_rows(grid, locked, destruction_sound):
@@ -249,15 +250,19 @@ def clear_rows(grid, locked, destruction_sound):
     return inc
      
 
-def draw_next_shape(shape, surface, topLeftX, topLeftY, playHeight, playWidth,
-                    blockSize):
+def draw_next_shape(shape, surface, top_left_x, top_left_y, play_height, play_width,
+                    block_size, theme):
     """"""
 
-    font = pygame.font.SysFont("comicsans", 30)
-    label = font.render("Next Shape", 1, (255, 255, 255))
+    if theme == "normal":
+        label_font = select_font(theme, 35)
+    else:
+        label_font = select_font(theme, 45)
+    
+    label = label_font.render("Next Shape:", 1, (255, 255, 255))
 
-    sx = topLeftX + playWidth + 50
-    sy = topLeftY + playHeight / 2 - 150
+    sx = top_left_x + play_width + 50
+    sy = top_left_y + play_height / 2 - 150
     format = shape.shape[shape.rotation % len(shape.shape)]
 
     for i, line in enumerate(format):
@@ -265,8 +270,8 @@ def draw_next_shape(shape, surface, topLeftX, topLeftY, playHeight, playWidth,
         for j, column in enumerate(row):
             if column == "0":
                 pygame.draw.rect(surface, shape.color,
-                                 (sx + j * blockSize, sy + i * blockSize,
-                                  blockSize, blockSize), 0)
+                                 (sx + j * block_size, sy + i * block_size,
+                                  block_size, block_size), 0)
                 pygame.draw.rect(surface,
                                  (128,128,128),
                                  (int(sx + j * 30), int(sy + i * 30), 30, 30),
@@ -275,50 +280,55 @@ def draw_next_shape(shape, surface, topLeftX, topLeftY, playHeight, playWidth,
     surface.blit(label, (sx + 10, sy - 50))
 
 
-def draw_window(topLeftX, topLeftY, playHeight, playWidth, blockSize, surface, grid, guide_grid,
-                score = 0):
+def draw_window(top_left_x, top_left_y, play_height, play_width, block_size, surface,
+                grid, guide_grid, theme, score = 0):
     """"""
 
-    pygame.font.init()
-    font = pygame.font.SysFont('comicsans', 60)
-    label = font.render("Tetris", 1, (255, 255, 255))
+    if theme == "normal":
+        title_font = select_font(theme, 70)
+        label_font = select_font(theme, 35)
+    else:
+        title_font = select_font(theme, 70)
+        label_font = select_font(theme, 45)
+    
+    label = title_font.render("Hand Tetris", 1, (255, 255, 255))
 
     surface.blit(label,
-                 (topLeftX + playWidth / 2 - (label.get_width() / 2), 30)
+                 (top_left_x + play_width / 2 - (label.get_width() / 2), 40)
     )
 
     # Score
-    font = pygame.font.SysFont("comicsans", 30)
-    label = font.render("Score: " + str(score), 1, (255, 255, 255))
+    label = label_font.render("Score: " + str(score), 1, (255, 255, 255))
 
-    sx = topLeftX + playWidth + 50
-    sy = topLeftY + playHeight / 2 - 150
-    syy = topLeftY - 50
+    score_x = top_left_x + play_width + 50
+    score_y = top_left_y + play_height / 2 - 180
+    top_left_y -= 80
+    guide_top_left_y = top_left_y - 50
 
-    surface.blit(label, (sx + 10, sy - 90))
+    surface.blit(label, (score_x + 10, score_y - 90))
 
     for i in range(len(grid)):
         for j in range(len(grid[i])):
             pygame.draw.rect(surface, grid[i][j],
-                             (topLeftX + j * blockSize,
-                              topLeftY + i * blockSize, blockSize, blockSize), 0)
+                             (top_left_x + j * block_size,
+                              top_left_y + i * block_size, block_size, block_size), 0)
             
     for i in range(len(guide_grid)):
         for j in range(len(guide_grid[i])):
             pygame.draw.rect(surface, guide_grid[i][j],
-                             (topLeftX + j * blockSize,
-                              syy + i * blockSize, blockSize, blockSize), 0)
+                             (top_left_x + j * block_size,
+                              guide_top_left_y + i * block_size, block_size, block_size), 0)
 
     pygame.draw.rect(surface, (255, 0, 0),
-                     (topLeftX, topLeftY, playWidth, playHeight), 4)
+                     (top_left_x, top_left_y, play_width, play_height), 4)
     
     pygame.draw.rect(surface, (255, 0, 0),
-                     (topLeftX, topLeftY, playWidth, playHeight), 4)
+                     (top_left_x, top_left_y, play_width, play_height), 4)
 
-    draw_grid(surface, grid, topLeftX, topLeftY, playHeight, playWidth,
-              blockSize)
+    draw_grid(surface, grid, top_left_x, top_left_y, play_height, play_width,
+              block_size)
     
-    draw_guide_grid(surface, guide_grid, topLeftX, topLeftY, blockSize)
+    draw_guide_grid(surface, guide_grid, top_left_x, top_left_y, block_size)
 
 
 def get_direction(old_x, new_x):
