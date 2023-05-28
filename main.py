@@ -30,7 +30,7 @@ theme_counter = 0
 win = pygame.display.set_mode((s_width, s_height)) # Surface object to display everything
 
 pygame.font.init()
-title_font = pygame.font.Font("media/Tetris_font.otf", 60)
+title_font = pygame.font.Font("media/Tetris_font.otf", 70)
 button_font = pygame.font.Font("media/Tetris_font.otf", 35)
 pygame.display.set_caption("Hand Tetris") # Name of the game window
 
@@ -235,7 +235,7 @@ def main_menu(win):
         win.blit(menu_background, (0, 0))
         game_title = title_font.render("HAND TETRIS", 1, (255, 255, 255))
         win.blit(game_title,
-                 (top_left_x + play_width / 2 - (game_title.get_width() / 2), 50)
+                 (top_left_x + play_width / 2 - (game_title.get_width() / 2), 100)
         )
 
         mouse_position = pygame.mouse.get_pos()
