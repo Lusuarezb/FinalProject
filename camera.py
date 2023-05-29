@@ -52,7 +52,8 @@ def camera_settings():
 
 
 def hand_controller(camera_captured, window_width, hands, hands_detector,
-                    hands_drawing, x_pos, x_boundaries, fall_speed_real):
+                    hands_drawing, x_pos, x_boundaries, fall_speed_real,
+                    rotate_time):
     """Controls the hand's movement and returns the corresponding movement.
     
     Inputs:
@@ -98,9 +99,10 @@ def hand_controller(camera_captured, window_width, hands, hands_detector,
                 y.append(int((1 - lm.y) * h))
 
                 if len(x) > 20: # When all coordinates are set
-                    # Hand gesture of an open hand.
-                    if (y[8] > y[5] and y[12] > y[9] and y[16] > y[13] 
-                        and y[20] > y[17]):
+                    # Hand gesture of an open hand -> move piece.
+                    if ((y[8] > y[5] and y[12] > y[9] and y[16] > y[13] 
+                        and y[20] > y[17])
+                        and (x[4] >= x[3] > x[5] > x[9] or x[4] < x[5] < x[9])):
                         center_x = int((x[5] + x[17]) / 2)
                         fixed_x = int(
                             np.interp(
@@ -108,13 +110,22 @@ def hand_controller(camera_captured, window_width, hands, hands_detector,
                                 [x_boundaries[0], x_boundaries[1] + 1]
                             )
                         )
+                        rotate_time = 0
                         fall_speed_down = fall_speed_real
 
-                    # Hand gesture of a closed fist.
+                    # Hand gesture of an open hand with thumb inside -> rotate.
+                    elif ((y[8] > y[5] and y[12] > y[9] and y[16] > y[13] 
+                        and y[20] > y[17])
+                        and ((x[4] < x[2] and x[5] > x[9])
+                             or (x[4] < x[2] and x[5] < x[9]))):
+                        rotate_time += 1
+
+                    # Hand gesture of a closed fist -> drop.
                     elif ((y[8] < y[5] and y[12] < y[9] and y[16] < y[13] 
-                        and y[20] < y[17]) and (y[3] > y[2])):
-                        fall_speed_down = 0.05
-    
+                        and y[20] < y[17]) and (y[3] > y[2] and y[4] > y[5])):
+                        rotate_time = 0
+                        fall_speed_down = 0.01
+
                     else:  # No gesture detected.
                         pass
 
@@ -128,4 +139,4 @@ def hand_controller(camera_captured, window_width, hands, hands_detector,
                    int((screen_height - window_height) / 2))
     cv2.imshow(window_name, frame) # Display the live camera
 
-    return fixed_x, fall_speed_down
+    return fixed_x, fall_speed_down, rotate_time

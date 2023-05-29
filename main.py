@@ -52,12 +52,13 @@ def main(win, theme):
     next_piece = get_shape()
     clock = pygame.time.Clock() 
     fall_time = 0
-    fall_speed_real = 0.27
+    fall_speed_real = 0.2  # Lower is faster
     fall_speed = fall_speed_real
+    rotate_time = 0
     level_time = 0
     score = 0
     sounds = select_sounds(theme)
-    colors = select_colors(theme)
+    colors = select_colors(theme)  # TODO
 
     pygame.mixer.music.play(loops = -1)
 
@@ -96,15 +97,16 @@ def main(win, theme):
         )
         # Position of the hand to determine the position of the piece and
         # speed of the piece.
-        hand_position, fall_speed_down = hand_controller(
+        hand_position, fall_speed_down, rotation = hand_controller(
                                          camera_captured,
                                          window_width, hands,
                                          hands_detector, hands_drawing,
                                          current_piece.x, position_values,
-                                         fall_speed_real
+                                         fall_speed_real, rotate_time
         )
 
         fall_speed = fall_speed_down
+        rotate_time = rotation
 
         # Fixing the position of the hand in case it goes out of bounds
         if hand_position >= (max_position_value + 1):
@@ -127,6 +129,15 @@ def main(win, theme):
                 current_piece.x -= 1
                 if not(valid_space(current_piece, grid)):
                     current_piece.x += 1
+
+        if rotate_time >= 3:
+            current_piece.rotation  += 1
+            rotate_time = 0
+
+            if not(valid_space(current_piece, grid)):
+                current_piece.rotation -= 1
+            else:
+                pygame.mixer.Sound.play(sounds["rotate"])
 
         # Increasing level difficulty every 5 seconds
         if level_time / 1000 > 5:
