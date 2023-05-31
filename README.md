@@ -1,4 +1,4 @@
-# **SoundGen**
+# **Hand Tetris**
 
 Proyecto final para la asignatura Creación multimedia.
 
@@ -23,10 +23,14 @@ Nuestro punto de partida consistía en que queríamos hacer un juego, y que estu
 
 ## **Funcionamiento.**
 
-[Video]
-
 El juego cuenta con dos temas principales para personalizar la experiencia de juego (esto incluye la fuente, las imágenes y los sonidos), los cuales son *Normal* y *Metal*, siendo este último una versión más rockera y extrema.
 
-Las instrucciones del juego son sencillas: como se observa en el video de muestra, al iniciar se abrirán dos ventanas, la del juego y la de la cámara. La de la cámara es una simple guía para observar cómo es que funcionará el control del juego usando una mano.
+---
 
-Al iniciar el juego comenzarán a caer las piezas como en cualquier versión normal de Tetris, el cambio ocurre cuando el jugador muestra una mano con la palma extendida frente a la cámara, pues así podrá controlar el movimiento horizontal de las piezas de acuerdo a la posición horizontal de su mano. Además, al cerrar la mano en un puño apuntando hacia arriba, se desencadenará el efecto de caída rápida de la pieza o *drop*. Finalmente, la rotación de la pieza se realiza por medio de la tecla de "arriba" del teclado.
+## **Instrucciones.**
+
+Para iniciar el juego hay que ejecutar el archivo *main.exe* que se encuentra en la carpeta main. Se abrirán dos ventanas, la del juego y la de la cámara. La de la cámara es una simple guía para observar cómo es que funcionará el control del juego usando una mano.
+
+Al iniciar el juego comenzarán a caer las piezas como en cualquier versión normal de Tetris, el cambio ocurre cuando el jugador muestra la mano izquierda con la palma extendida frente a la cámara, pues así podrá controlar el movimiento horizontal de las piezas de acuerdo a la posición horizontal de su mano. Luego, teniendo de igual forma la mano extendida pero doblando el pulgar hacia adentro de la palma, se podrá rotar la pieza. Finalmente, al cerrar la mano en un puño (siempre mirando hacia la cámara), se desencadenará el efecto de caída rápida de la pieza o *drop*.
+
+El juego continuará indefinidamente hasta que el jugador decida detenerse o hasta que pierda.
