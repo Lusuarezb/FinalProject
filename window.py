@@ -125,7 +125,6 @@ def draw_theme_button(win, offset, theme, font):
 
     theme_button_color = (255, 255, 255)
     theme_button_text_color = (0, 0, 255)
-    # font = pygame.font.SysFont('comicsans', 25)
     theme_text = f"Theme selected: {theme}"
     theme_text_width, theme_text_height = font.size(theme_text)
     theme_button_text = font.render(theme_text, True,
@@ -156,8 +155,7 @@ def draw_instructions_button(win):
     return
 
 
-def draw_text_middle(surface, text, size, color, top_left_x, top_left_y, play_height,
-                     play_width):
+def draw_text_middle(surface, text, font, color):
     """Writes the given text in the middle of the screen (surface).
     
     Inputs:
@@ -167,12 +165,30 @@ def draw_text_middle(surface, text, size, color, top_left_x, top_left_y, play_he
     color -> (tuple) RGB formatted color of the text.
     """
 
-    font = pygame.font.SysFont("comicsans", size, bold = True)
     label = font.render(text, 1, color)
-    surface.blit(
-        label, (top_left_x + play_width / 2 - (label.get_width() / 2),
-                top_left_y + play_height / 2 - label.get_height() / 2)
-    )
+    window_width = surface.get_width()
+    window_height = surface.get_height()
+    text_width = label.get_width()
+    text_height = label.get_height()
+    offset = 10
+
+    coords = {
+        "up": (window_height - text_height) / 2 - offset,
+        "down": (window_height + text_height) / 2 + offset,
+        "left": (window_width - text_width) / 2 - offset,
+        "right": (window_width + text_width) / 2 + offset
+    }
+
+    pygame.draw.rect(surface = surface, color = (255, 0, 0),
+                     rect = (coords["left"],
+                             coords["up"],
+                             text_width + offset * 2,
+                             text_height + offset * 2),
+                     border_radius = 0,
+                     width = 0)
+    
+    surface.blit(label, (coords["left"] + offset,
+              coords["up"] + offset))
    
 
 def draw_grid(surface, grid, top_left_x, top_left_y, play_height, play_width,

@@ -2,7 +2,7 @@ import os
 
 from camera import *
 from piece import *
-from themes import select_sounds, select_colors
+from themes import select_colors, select_sounds
 from window import *
 
 # Window size and configuration variables.
@@ -27,7 +27,7 @@ guide_left_y = top_left_y - 50
 themes_list = ["normal", "metal"]
 theme_counter = 0
 
-win = pygame.display.set_mode((s_width, s_height)) # Surface object to display everything
+win = pygame.display.set_mode((s_width, s_height)) # Surface object (Screen).
 
 pygame.font.init()
 title_font = pygame.font.Font("media/Tetris_font.otf", 70)
@@ -105,19 +105,21 @@ def main(win, theme):
                                          fall_speed_real, rotate_time
         )
 
+        # Change speed and rotation depending on the hand gestures.
         fall_speed = fall_speed_down
         rotate_time = rotation
 
-        # Fixing the position of the hand in case it goes out of bounds
+        # Fixing the position of the hand in case it goes out of bounds.
         if hand_position >= (max_position_value + 1):
             hand_position = max_position_value
 
-        # Creating the grid again with the corresponding positions locked
+        # Creating the grid again with the corresponding positions locked.
         grid = create_grid(locked_positions)
         fall_time += clock.get_rawtime() # Time for the pieces to fall
         level_time += clock.get_rawtime() # Time to increase the difficulty
         clock.tick()
 
+        # Movement correction of the piece.
         if(current_piece.x != hand_position):
             dif_pos = hand_position - current_piece.x
             if (dif_pos > 0):
@@ -130,6 +132,7 @@ def main(win, theme):
                 if not(valid_space(current_piece, grid)):
                     current_piece.x += 1
 
+        # The piece rotates if detects the gesture more than 3 frames.
         if rotate_time >= 3:
             current_piece.rotation  += 1
             rotate_time = 0
@@ -219,8 +222,7 @@ def main(win, theme):
             pygame.mixer.music.stop()
             pygame.mixer.Sound.play(sounds["lose"])
 
-            draw_text_middle(win, "You Lost!", 80, (255, 255, 255), top_left_x,
-                             top_left_y, play_height, play_width)
+            draw_text_middle(win, "You Lost!", title_font, (255, 255, 255))
             pygame.display.update()
             pygame.time.delay(1500)
             run_game = False

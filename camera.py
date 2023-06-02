@@ -116,13 +116,13 @@ def hand_controller(camera_captured, window_width, hands, hands_detector,
                     # Hand gesture of an open hand with thumb inside -> rotate.
                     elif ((y[8] > y[5] and y[12] > y[9] and y[16] > y[13] 
                         and y[20] > y[17])
-                        and ((x[4] < x[2] and x[5] > x[9])
-                             or (x[4] < x[2] and x[5] < x[9]))):
+                        and ((x[4] < x[3] and x[5] > x[9])
+                             or (x[4] > x[3] and x[5] < x[9]))):
                         rotate_time += 1
 
                     # Hand gesture of a closed fist -> drop.
                     elif ((y[8] < y[5] and y[12] < y[9] and y[16] < y[13] 
-                        and y[20] < y[17]) and (y[3] > y[2] and y[4] > y[5])):
+                        and y[20] < y[17]) and (y[3] > y[2])):
                         rotate_time = 0
                         fall_speed_down = 0.01
 

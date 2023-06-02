@@ -1,4 +1,5 @@
 from random import choice
+
 from tetrominos import *
 
 # Shape formats, positions and colors

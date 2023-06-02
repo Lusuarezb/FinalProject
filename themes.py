@@ -1,4 +1,4 @@
-from pygame import mixer, font
+from pygame import font, mixer
 
 mixer.init()
 
