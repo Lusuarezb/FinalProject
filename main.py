@@ -2,7 +2,7 @@ import os
 
 from camera import *
 from piece import *
-from themes import select_colors, select_sounds
+from themes import select_sounds
 from window import *
 
 # Window size and configuration variables.
@@ -54,11 +54,12 @@ def main(win, theme):
     fall_time = 0
     fall_speed_real = 0.2  # Lower is faster
     fall_speed = fall_speed_real
-    rotate_time = 0
+    # rotate_time = 0
+    is_rotating = False
+    has_rotated = False
     level_time = 0
     score = 0
     sounds = select_sounds(theme)
-    colors = select_colors(theme)  # TODO
 
     pygame.mixer.music.play(loops = -1)
 
@@ -97,17 +98,18 @@ def main(win, theme):
         )
         # Position of the hand to determine the position of the piece and
         # speed of the piece.
-        hand_position, fall_speed_down, rotation = hand_controller(
+        hand_position, fall_speed_down, is_rotating, has_rotated = hand_controller(
                                          camera_captured,
                                          window_width, hands,
                                          hands_detector, hands_drawing,
                                          current_piece.x, position_values,
-                                         fall_speed_real, rotate_time
+                                         fall_speed_real, is_rotating,
+                                         has_rotated
         )
 
         # Change speed and rotation depending on the hand gestures.
         fall_speed = fall_speed_down
-        rotate_time = rotation
+        # rotate_time = rotation
 
         # Fixing the position of the hand in case it goes out of bounds.
         if hand_position >= (max_position_value + 1):
@@ -133,9 +135,12 @@ def main(win, theme):
                     current_piece.x += 1
 
         # The piece rotates if detects the gesture more than 3 frames.
-        if rotate_time >= 3:
+        # if rotate_time >= 3:
+        if is_rotating and not has_rotated:
             current_piece.rotation  += 1
-            rotate_time = 0
+            # rotate_time = 0
+            is_rotating = False
+            has_rotated = True
 
             if not(valid_space(current_piece, grid)):
                 current_piece.rotation -= 1
