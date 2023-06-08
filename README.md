@@ -39,7 +39,7 @@ Los gestos de la mano se reconocen por medio de marcadores que Mediapipe usa a l
 *Imagen tomada de la documentación de MediaPipe, citada arriba.*
 <br><br>
 
-Finalmente, la ventana del juego y el juego en general se realizaron haciendo uso de la librería [PyGame](https://www.pygame.org/docs/), la cual, como su nombre lo indica, es una librería dedicada al desarrollo de videojuegos usando Python. Con esta se pueden controlar las figuras, imágenes, música y sonidos que se quieran dentro del juego.
+Finalmente, la ventana de juego y el juego en general se realizaron haciendo uso de la librería [PyGame](https://www.pygame.org/docs/), la cual, como su nombre lo indica, es una librería dedicada al desarrollo de videojuegos usando Python. Con esta se pueden controlar las figuras, imágenes, música y sonidos que se quieran dentro del juego.
 
 ---
 
