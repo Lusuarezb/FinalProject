@@ -108,7 +108,6 @@ def main(win, theme):
 
         # Change speed and rotation depending on the hand gestures.
         fall_speed = fall_speed_down
-        # rotate_time = rotation
 
         # Fixing the position of the hand in case it goes out of bounds.
         if hand_position >= (max_position_value + 1):
