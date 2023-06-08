@@ -31,11 +31,13 @@ Al hacer click en "Theme Selected" se cambiará entre los dos temas principales 
 
 Al hacer click en el botón "Start Game" se iniciará el juego, el cual, en jugabilidad se comporta exactamente igual a un Tetris normal. La principal diferencia son los controles, los cuales ahora estan asignados a la mano del jugador. El objetivo es entonces alcanzar la máxima puntuación eliminando la mayor cantidad de filas posible. 
 
-Internamente, en cuanto a código, el control de la cámara y la detección de las manos se realizan con las librerías [OpenCV](https://docs.opencv.org/3.4/d6/d00/tutorial_py_root.html) y [Mediapipe](https://developers.google.com/mediapipe/) respectivamente. Estas dos librerías son conocidas por su gran capacidad de de procesamiento y reconocimiento de imágenes, videos, patrones y demás, siendo muy usada por esto en el campo de Visión Artificial.
+Internamente, en cuanto a código, el control de la cámara y la detección de las manos se realizan con las librerías [OpenCV](https://docs.opencv.org/3.4/d6/d00/tutorial_py_root.html) y [MediaPipe](https://developers.google.com/mediapipe/) respectivamente. Estas dos librerías son conocidas por su gran capacidad de de procesamiento y reconocimiento de imágenes, videos, patrones y demás, siendo muy usada por esto en el campo de Visión Artificial.
 
 Los gestos de la mano se reconocen por medio de marcadores que Mediapipe usa a lo largo de las articulaciones de la mano, asignándole a cada una un nodo, del cual se pueden extraer sus coordenadas *X* y *Y* y por tanto detectar los diferentes gestos que el jugador realice.
 
-[Imagen manos]
+<img width="1073" alt="hand-landmarks" src="https://github.com/Lusuarezb/FinalProject/assets/51925588/44bb1726-0ad1-4454-83ef-0d4381bcf674">
+*Imagen tomada de la documentación de MediaPipe, citada arriba.*
+<br><br>
 
 Finalmente, la ventana del juego y el juego en general se realizaron haciendo uso de la librería [PyGame](https://www.pygame.org/docs/), la cual, como su nombre lo indica, es una librería dedicada al desarrollo de videojuegos usando Python. Con esta se pueden controlar las figuras, imágenes, música y sonidos que se quieran dentro del juego.
 
