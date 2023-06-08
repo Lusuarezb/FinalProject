@@ -52,7 +52,7 @@ def main(win, theme):
     next_piece = get_shape()
     clock = pygame.time.Clock() 
     fall_time = 0
-    fall_speed_real = 0.2  # Lower is faster
+    fall_speed_real = 0.15  # Lower is faster
     fall_speed = fall_speed_real
     is_rotating = False
     has_rotated = False
