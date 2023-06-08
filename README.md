@@ -33,4 +33,6 @@ Para iniciar el juego hay que ejecutar el archivo *main.exe* que se encuentra en
 
 Al iniciar el juego comenzarán a caer las piezas como en cualquier versión normal de Tetris, el cambio ocurre cuando el jugador muestra la mano izquierda con la palma extendida frente a la cámara, pues así podrá controlar el movimiento horizontal de las piezas de acuerdo a la posición horizontal de su mano. Luego, teniendo de igual forma la mano extendida pero doblando el pulgar hacia adentro de la palma, se podrá rotar la pieza. Finalmente, al cerrar la mano en un puño (siempre mirando hacia la cámara), se desencadenará el efecto de caída rápida de la pieza o *drop*.
 
+![How to Play](https://github.com/Lusuarezb/FinalProject/assets/83037028/25111fba-0eaf-46bf-9a85-ee8f9330d90d)
+
 El juego continuará indefinidamente hasta que el jugador decida detenerse o hasta que pierda.
