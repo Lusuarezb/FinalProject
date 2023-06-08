@@ -54,7 +54,6 @@ def main(win, theme):
     fall_time = 0
     fall_speed_real = 0.2  # Lower is faster
     fall_speed = fall_speed_real
-    # rotate_time = 0
     is_rotating = False
     has_rotated = False
     level_time = 0
@@ -135,10 +134,8 @@ def main(win, theme):
                     current_piece.x += 1
 
         # The piece rotates if detects the gesture more than 3 frames.
-        # if rotate_time >= 3:
         if is_rotating and not has_rotated:
             current_piece.rotation  += 1
-            # rotate_time = 0
             is_rotating = False
             has_rotated = True
 
