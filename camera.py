@@ -134,7 +134,7 @@ def hand_controller(camera_captured, window_width, hands, hands_detector,
                         # rotate_time = 0
                         is_rotating = False
                         has_rotated = False
-                        fall_speed_down = 0.01
+                        fall_speed_down = 0.05
 
                     else:  # No gesture detected.
                         pass
